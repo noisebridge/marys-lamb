@@ -1,5 +1,6 @@
 import pygame
 import redis
+import redis_io
 
 PI_IP = '192.168.0.11'
 PORT=6379
@@ -31,6 +32,9 @@ while True:
                 print('STOP')
                 r.set(control_cmd_key, 'STOP')
     pygame.display.update()
+    img = redis_io.get_np_image_3d(r, control_cmd_key)
+    surface = pygame.surfarray.make_surface(img).convert()
+    gameDisplay.blit(surface, (0,0))
     clock.tick(30)
 
 

@@ -22,8 +22,11 @@ class PCA9685:
             def get_bus():
                 return busnum
             I2C.get_default_bus = get_bus
-        self.pwm = Adafruit_PCA9685.PCA9685(address=address)
-        self.pwm.set_pwm_freq(frequency)
+        try: 
+            self.pwm = Adafruit_PCA9685.PCA9685(address=address)
+            self.pwm.set_pwm_freq(frequency)
+        except OSError as e:
+            raise e
         self.run(DiscreteControls.STOP)
         time.sleep(init_delay) # "Tamiya TBLE-02" makes a little leap otherwise
 
