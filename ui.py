@@ -32,7 +32,9 @@ while True:
                 print('STOP')
                 r.set(control_cmd_key, 'STOP')
     pygame.display.update()
-    img = redis_io.get_np_image_3d("img", r)
+    # TODO : split this into separate function
+    img = redis_io.get_np_image_3d("img", r).transpose([1, 0, 2])
+    img = img[:, :, ::-1]
     surface = pygame.surfarray.make_surface(img).convert()
     gameDisplay.blit(surface, (0,0))
     clock.tick(30)
