@@ -1,6 +1,6 @@
 import pygame
-import redis
 import redis_io
+import redis
 
 PI_IP = '192.168.0.11'
 PORT=6379
@@ -11,7 +11,7 @@ pygame.init()
 clock = pygame.time.Clock()
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Mary controller')
-r = redis.Redis(PI_IP, port=PORT, db=0) 
+r = redis.Redis(PI_IP, port=PORT, db=0)
 font = pygame.font.Font('freesansbold.ttf', 24)
 
 while True:
@@ -32,7 +32,9 @@ while True:
                 print('STOP')
                 r.set(control_cmd_key, 'STOP')
     pygame.display.update()
-    img = redis_io.get_np_image_3d(r, control_cmd_key)
+    # TODO : split this into separate function
+    img = redis_io.get_np_image_3d("img", r).transpose([1, 0, 2])
+    img = img[:, :, ::-1]
     surface = pygame.surfarray.make_surface(img).convert()
     gameDisplay.blit(surface, (0,0))
     clock.tick(30)

@@ -11,7 +11,9 @@ redis_inst =  redis.Redis(host='localhost', port=REDIS_PORT, db=0)
 
 # Assumes the image is np.uint8
 
-def store_np_image(img_nparray, key):
+def store_np_image(img_nparray, key, r=None):
+   if r is None:
+       r = get_redis_instance()
    """Store given Numpy array 'img_nparray' in Redis under key 'key'"""
    if len(img_nparray.shape) == 2:
        h, w = img_nparray.shape
@@ -22,10 +24,12 @@ def store_np_image(img_nparray, key):
    encoded = shape + img_nparray.tobytes()
 
    # Store encoded data in Redis
-   redis_inst.set(key,encoded)
+   r.set(key,encoded)
 
-def get_np_image_3d(redis_inst,n):
+def get_np_image_3d(n, r=None):
    """Retrieve Numpy array from Redis key 'n'"""
+   if r is None:
+       r = get_redis_instance()
    encoded = r.get(n)
    h, w, d = struct.unpack('>III',encoded[:12])
    # Add slicing here, or else the array would differ from the original
