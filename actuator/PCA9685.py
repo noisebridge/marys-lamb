@@ -43,11 +43,11 @@ class PCA9685:
                 self.set_pulse(0, 0)
                 self.set_pulse(360, 1)
             elif pca_input == DiscreteControls.LEFT:
-                self.set_pulse(405, 0)
-                self.set_pulse(410, 1)
+                self.set_pulse(430, 0)
+                self.set_pulse(430, 1)
             elif pca_input == DiscreteControls.RIGHT:
-                self.set_pulse(405, 0)
-                self.set_pulse(300, 1)
+                self.set_pulse(430, 0)
+                self.set_pulse(280, 1)
             elif pca_input == DiscreteControls.FWD:
                 self.set_pulse(435, 0)
                 self.set_pulse(360, 1)

@@ -11,6 +11,8 @@ class PiCamSensor:
     def __init__(self, sensor_params):
         # initialize the camera and grab a reference to the raw camera capture
         self._camera = PiCamera()
+        self._camera.resolution = (320, 240)
+        self._camera.framerate = 10
         self._camera.start_preview()
         self._stream = io.BytesIO()
         # allow the camera to warmup
