@@ -1,15 +1,16 @@
 # marys-lamb
 Building a cute little bot that wins Noisebridgers hearts. And money.
 
-
 # How to run code
 
-Install the following (Python) dependencies (will make install file):
 
-- opencv 
+## Dependencies
+Install the following (Python) dependencies (will make install file):
+- asyncio
 - numpy
-- redis  
-- Adafruit PCA9685 library 
+- cv2
+- PCA9685 library 
+- redis
 
 ## Running on pi
 
