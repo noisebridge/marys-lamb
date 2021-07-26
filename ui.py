@@ -2,7 +2,10 @@ import pygame
 import redis_io
 import redis
 
-PI_IP = '192.168.0.11'
+# Home
+# PI_IP = '192.168.0.11'
+# Noisebridge
+PI_IP = '10.21.1.214'
 PORT=6379
 display_width = 800
 display_height = 600
