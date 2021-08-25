@@ -1,14 +1,18 @@
 import pygame
 import redis_io
 import redis
+import cv2
+from vision.unet import UNetWrapper
 
 # Home
-# PI_IP = '192.168.0.11'
+PI_IP = '192.168.0.11'
 # Noisebridge
-PI_IP = '10.21.1.214'
+# PI_IP = '10.21.1.214'
 PORT=6379
 display_width = 800
 display_height = 600
+unet = UNetWrapper()
+unet.generate_model("/Users/tjmelanson/development/tensorflow_sandbox/training_best/cp-best.ckpt")
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -36,9 +40,13 @@ while True:
                 r.set(control_cmd_key, 'STOP')
     pygame.display.update()
     # TODO : split this into separate function
-    img = redis_io.get_np_image_3d("img", r).transpose([1, 0, 2])
+    img = redis_io.get_np_image_3d("img", r)
     img = img[:, :, ::-1]
-    surface = pygame.surfarray.make_surface(img).convert()
+    cv2.imwrite("input.png", img)
+    img_overlay = unet.predict(img)
+    cv2.imwrite("predict.png", img_overlay)
+    img_overlay = img_overlay.transpose([1, 0, 2])
+    surface = pygame.surfarray.make_surface(img_overlay).convert()
     gameDisplay.blit(surface, (0,0))
     clock.tick(30)
 
