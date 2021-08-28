@@ -3,6 +3,8 @@ import redis_io
 import redis
 import cv2
 from vision.unet import UNetWrapper
+from vision import median_path 
+import numpy as np
 
 # Home
 PI_IP = '192.168.0.11'
@@ -43,9 +45,12 @@ while True:
     img = redis_io.get_np_image_3d("img", r)
     img = img[:, :, ::-1]
     cv2.imwrite("input.png", img)
-    img_overlay = unet.predict(img)
+    mask = unet.predict(img)
+    img_overlay = cv2.resize(img, (128, 128))
+    img_overlay[:,:,1] = img_overlay[:,:,1]/2 + np.maximum(img_overlay[:,:,1], mask)/2
     cv2.imwrite("predict.png", img_overlay)
     img_overlay = img_overlay.transpose([1, 0, 2])
+    median_path.draw_median_line(img_overlay, median_path.median_line(mask))
     surface = pygame.surfarray.make_surface(img_overlay).convert()
     gameDisplay.blit(surface, (0,0))
     clock.tick(30)
