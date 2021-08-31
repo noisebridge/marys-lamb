@@ -3,6 +3,7 @@ from controller.controller_enum import DiscreteControls
 
 PCA_THROTTLE=1
 PCA_STEERING=1
+FULL_THROTTLE=390
 
 class PCA9685:
     ''' 
@@ -27,7 +28,8 @@ class PCA9685:
             self.pwm.set_pwm_freq(frequency)
         except OSError as e:
             raise e
-        self.run(DiscreteControls.STOP)
+        self.set_pulse(360, 0)
+        self.set_pulse(360, 1)
         time.sleep(init_delay) # "Tamiya TBLE-02" makes a little leap otherwise
 
     def set_pulse(self, pulse, channel=PCA_THROTTLE):
@@ -41,16 +43,16 @@ class PCA9685:
         if type(pca_input) == DiscreteControls:
             if pca_input == DiscreteControls.STOP:
                 self.set_pulse(0, 0)
-                self.set_pulse(360, 1)
+                self.set_pulse(375, 1)
             elif pca_input == DiscreteControls.LEFT:
-                self.set_pulse(430, 0)
-                self.set_pulse(430, 1)
+                self.set_pulse(FULL_THROTTLE, 0)
+                self.set_pulse(445, 1)
             elif pca_input == DiscreteControls.RIGHT:
-                self.set_pulse(430, 0)
-                self.set_pulse(280, 1)
+                self.set_pulse(FULL_THROTTLE, 0)
+                self.set_pulse(305, 1)
             elif pca_input == DiscreteControls.FWD:
-                self.set_pulse(435, 0)
-                self.set_pulse(360, 1)
+                self.set_pulse(FULL_THROTTLE, 0)
+                self.set_pulse(375, 1)
             else:
                 raise ValueError("Unrecognized DiscreteControls enum value")
         else:

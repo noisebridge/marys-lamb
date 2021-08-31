@@ -43,11 +43,9 @@ while True:
     pygame.display.update()
     # TODO : split this into separate function
     img = redis_io.get_np_image_3d("img", r)
-    img = img[:, :, ::-1]
+    img = bgr_to_rgb(img)
     cv2.imwrite("input.png", img)
     mask = unet.predict(img)
-    img_overlay = cv2.resize(img, (128, 128))
-    img_overlay[:,:,1] = img_overlay[:,:,1]/2 + np.maximum(img_overlay[:,:,1], mask)/2
     cv2.imwrite("predict.png", img_overlay)
     img_overlay = img_overlay.transpose([1, 0, 2])
     median_path.draw_median_line(img_overlay, median_path.median_line(mask))

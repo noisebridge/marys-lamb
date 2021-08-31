@@ -64,6 +64,11 @@ class UNetWrapper:
 
       return self._model
 
+    def convert_to_tf_lite(self):
+      converter  = tf.lite.TFLiteConverter.from_keras_model(self._model_lite)
+      self._model_lite = converter.convert()
+      
+
     def train(self):
       model = unet_model(2)
       model.compile(optimizer='adam',
