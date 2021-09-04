@@ -22,6 +22,8 @@ def main():
     controller = default_redis_controller(redis_inst)
     unet = UNetWrapper()
     unet.generate_model("/home/pi/tf14-best.h5")
+    # unet.load_tf_lite_model()
+    unet.save_keras_model()
     # Only run actuator if present
     try:
         actuator = PCA9685()
