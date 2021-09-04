@@ -23,7 +23,7 @@ def main():
     unet = UNetWrapper()
     unet.generate_model("/home/pi/tf14-best.h5")
     # unet.load_tf_lite_model()
-    unet.save_keras_model()
+    # unet.save_keras_model()
     # Only run actuator if present
     try:
         actuator = PCA9685()
@@ -33,17 +33,22 @@ def main():
 
     # TODO: Make this asynchronous
     i=0
+    img=None
+    mask=None
+    directon = DiscreteControls.STOP
     while True:
         start_time = time.time()
-        img = picam.sense()
-        print("time taken for picam.sense", time.time() - start_time)
-        mask = unet.predict(img)
-        print("time taken up to mask", time.time() - start_time)
-        img_overlay = overlay_image(img, mask)
-        #store_np_image(img, "img")
-        store_np_image(img_overlay, "img")
-        print("time taken to store image", time.time() - start_time)
-        direction = create_action(mask)
+        if i%2==0 or img is None:
+            img = picam.sense()
+            print("time taken for picam.sense", time.time() - start_time)
+        else:
+            mask = unet.predict(img)
+            print("time taken for mask", time.time() - start_time)
+        if mask is not None: 
+            img_overlay = overlay_image(img, mask)
+            direction = create_action(mask)
+            store_np_image(img_overlay, "img")
+            print("time taken to store image", time.time() - start_time)
         try:
             controller_direction = controller.run()
             if controller_direction == DiscreteControls.STOP:
@@ -55,5 +60,6 @@ def main():
             
         except KeyError as e:
             print(e)
+        i+=1
 
 main()
