@@ -38,6 +38,7 @@ class UNetWrapper:
         self._model = None
 
     def generate_model(self, ckpt_dir=None):
+      
       inputs = tf.keras.layers.Input(shape=[128, 128, 3])
 
       # Downsampling through the model
@@ -63,6 +64,13 @@ class UNetWrapper:
         self._model.load_weights(ckpt_dir)
 
       return self._model
+
+    def load_tf_lite_model(self):
+      converter = tf.lite.TFLiteConverter.from_keras_model_file('keras_model')
+      self._model = converter.convert()
+      
+    def save_keras_model(self):
+      self._model.save('keras_model')
 
     def train(self):
       model = unet_model(2)

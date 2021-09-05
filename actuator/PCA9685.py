@@ -1,9 +1,12 @@
 import time
 from controller.controller_enum import DiscreteControls
 
-PCA_THROTTLE=1
+PCA_THROTTLE=0
 PCA_STEERING=1
+FULL_THROTTLE=410
+COAST=400
 
+# TODO : USE PCA_THROTTLE and PCA_STEERING in code.
 class PCA9685:
     ''' 
     PWM motor controler using PCA9685 boards. 
@@ -27,8 +30,10 @@ class PCA9685:
             self.pwm.set_pwm_freq(frequency)
         except OSError as e:
             raise e
-        self.run(DiscreteControls.STOP)
+        self.set_pulse(360, 0)
+        self.set_pulse(360, 1)
         time.sleep(init_delay) # "Tamiya TBLE-02" makes a little leap otherwise
+        self._accel = False
 
     def set_pulse(self, pulse, channel=PCA_THROTTLE):
         try:
@@ -36,21 +41,34 @@ class PCA9685:
         except:
             self.pwm.set_pwm(channel, 0, int(pulse * self.pwm_scale))
 
+    '''
+      Because keeping the vehicle at speed required fine tuning of the PWM output,
+      the car simply alternates between acceleration and coasting, so as not to build up speed
+    '''
+    def intermittent_accel(self, channel=PCA_THROTTLE):
+        if self._accel:
+            self.set_pulse(COAST, channel)
+            self._accel = False
+        else:
+            self.set_pulse(FULL_THROTTLE, channel)
+            self._accel = True
+    
+
     def run(self, pca_input):
         # Only supported case: DiscreteControls
         if type(pca_input) == DiscreteControls:
             if pca_input == DiscreteControls.STOP:
-                self.set_pulse(0, 0)
-                self.set_pulse(360, 1)
+                self.set_pulse(0, PCA_THROTTLE)
+                self.set_pulse(375, PCA_STEERING)
             elif pca_input == DiscreteControls.LEFT:
-                self.set_pulse(430, 0)
-                self.set_pulse(430, 1)
+                self.intermittent_accel(PCA_THROTTLE)
+                self.set_pulse(445, PCA_STEERING)
             elif pca_input == DiscreteControls.RIGHT:
-                self.set_pulse(430, 0)
-                self.set_pulse(280, 1)
+                self.intermittent_accel(PCA_THROTTLE)
+                self.set_pulse(305, PCA_STEERING)
             elif pca_input == DiscreteControls.FWD:
-                self.set_pulse(435, 0)
-                self.set_pulse(360, 1)
+                self.intermittent_accel(PCA_THROTTLE)
+                self.set_pulse(375, PCA_STEERING)
             else:
                 raise ValueError("Unrecognized DiscreteControls enum value")
         else:
@@ -59,22 +77,13 @@ class PCA9685:
 
 if __name__ == "__main__":
     pca = PCA9685()
-    pca.set_pulse(370, channel=0)
-    time.sleep(1)
-    pca.set_pulse(410, channel=0)
-    time.sleep(1)
-    # Neutral steering 
-    pca.set_pulse(350, channel=1)
-    time.sleep(1)
-    # Left
-    pca.set_pulse(400, channel=1)
-    time.sleep(1)
-    # Right
-    pca.set_pulse(300, channel=1)
-    time.sleep(1)
-    # Can't figure out backwards PWM ?
-    #pca.set_pulse()
-    #time.sleep(1)
-    pca.set_pulse(370, channel=0)
-    pca.set_pulse(350, channel=1)
-    time.sleep(1)
+    # Start moving
+    for i in range(4):
+        pca.set_pulse(FULL_THROTTLE, channel=PCA_THROTTLE)
+        print("Full throttle")
+        time.sleep(0.5)
+        pca.set_pulse(COAST, channel=PCA_THROTTLE)
+        print("Coasting")
+        time.sleep(0.5)
+    pca.set_pulse(360, channel=PCA_THROTTLE)
+    print("Stopped")

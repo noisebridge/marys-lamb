@@ -3,7 +3,6 @@ import redis_io
 import redis
 import cv2
 import numpy as np
-from planning.fishbrain import create_action
 
 # Home
 PI_IP = '192.168.0.11'
