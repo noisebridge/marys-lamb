@@ -2,9 +2,8 @@ import pygame
 import redis_io
 import redis
 import cv2
-from vision.unet import UNetWrapper
-from vision import median_path 
 import numpy as np
+from planning.fishbrain import create_action
 
 # Home
 PI_IP = '192.168.0.11'
@@ -13,8 +12,6 @@ PI_IP = '192.168.0.11'
 PORT=6379
 display_width = 800
 display_height = 600
-unet = UNetWrapper()
-unet.generate_model("/Users/tjmelanson/development/tensorflow_sandbox/training_best/cp-best.ckpt")
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -44,14 +41,15 @@ while True:
     # TODO : split this into separate function
     img = redis_io.get_np_image_3d("img", r)
     img = img[:, :, ::-1]
+    img = img.transpose([1, 0, 2])
     cv2.imwrite("input.png", img)
-    mask = unet.predict(img)
-    img_overlay = cv2.resize(img, (128, 128))
-    img_overlay[:,:,1] = img_overlay[:,:,1]/2 + np.maximum(img_overlay[:,:,1], mask)/2
-    cv2.imwrite("predict.png", img_overlay)
-    img_overlay = img_overlay.transpose([1, 0, 2])
-    median_path.draw_median_line(img_overlay, median_path.median_line(mask))
-    surface = pygame.surfarray.make_surface(img_overlay).convert()
+    #mask = unet.predict(img)
+    #img_overlay = cv2.resize(img, (128, 128))
+    #img_overlay[:,:,1] = img_overlay[:,:,1]/2 + np.maximum(img_overlay[:,:,1], mask)/2
+    #cv2.imwrite("predict.png", img_overlay)
+    #median_path.draw_median_line(img_overlay, median_path.median_line(mask))
+
+    surface = pygame.surfarray.make_surface(img).convert()
     gameDisplay.blit(surface, (0,0))
     clock.tick(30)
 
