@@ -1,0 +1,10 @@
+# Connection parameters
+raspberry_pi_ip: '192.168.0.11'
+port: 6379
+
+# Model parameters
+model_checkpoint: "/Users/tjmelanson/development/tensorflow_sandbox/training_best/cp-best.ckpt"
+
+# Display parameters
+display_width:  800
+display_height: 600
