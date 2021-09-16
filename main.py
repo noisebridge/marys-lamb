@@ -44,22 +44,25 @@ def main():
         else:
             mask = unet.predict(img)
             print("time taken for mask", time.time() - start_time)
-        if mask is not None: 
             img_overlay = overlay_image(img, mask)
-            direction = create_action(mask)
             store_np_image(img_overlay, "img")
             print("time taken to store image", time.time() - start_time)
+        if mask is not None:
+            direction = create_action(mask)
         try:
             controller_direction = controller.run()
+            # For always control:
+            #if True:
+            #    direction = controller_direction
             if controller_direction == DiscreteControls.STOP:
                 direction = controller_direction
-            print(direction)
             
             if actuator:
                 actuator.run(direction)
-            
+
         except KeyError as e:
             print(e)
+        print(direction)
         i+=1
 
 main()
