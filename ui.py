@@ -38,6 +38,7 @@ while True:
     img = redis_io.get_np_image_3d("img", r)
     img = img[:, :, ::-1]
     img = img.transpose([1, 0, 2])
+    img = cv2.resize(img, (800, 800))
     cv2.imwrite("input.png", img)
     
     #mask = unet.predict(img)
