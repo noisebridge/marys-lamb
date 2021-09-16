@@ -32,11 +32,21 @@ class Thresholder:
         print("Lower threshold: ", thresholder._lower_bound)
         cv2.imshow("Thresholded image", thresholder.lane_thresholded_img())
 
+    @staticmethod
+    def on_open_kernel_trackbar(val):
+        val_odd = (val-1)*2+1
+        print("Open kernel size", val_odd) 
+        kernel = np.ones([val_odd, val_odd], np.uint8)
+        img = thresholder.lane_thresholded_img()
+        opened = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+        cv2.imshow("Thresholded image", opened)
+
+
 if __name__ == "__main__":
     img = cv2.imread(sys.argv[1])
     cv2.imshow("Input image: ", img)
     cv2.waitKey(0)
-    cv2.resize(img, (500, 500))
+    img = cv2.resize(img, (500, 500))
     thresholder = Thresholder(img)
     trackbar_name = lambda side,i : "{} {} slider".format(side, i)
     title_window = "Thresholded slider"
@@ -51,6 +61,8 @@ if __name__ == "__main__":
     cv2.createTrackbar(trackbar_name("lower",0), title_window , 0, 255, trackbar_lower_wrapper[0])
     cv2.createTrackbar(trackbar_name("lower",1), title_window , 0, 255, trackbar_lower_wrapper[1])
     cv2.createTrackbar(trackbar_name("lower",2), title_window , 0, 255, trackbar_lower_wrapper[2])
+    # Open kernel
+    cv2.createTrackbar("Open slider", title_window, 0, 30, Thresholder.on_open_kernel_trackbar)
     for i in range(N_COLORS):
         trackbar_upper_wrapper[i](255)
         trackbar_lower_wrapper[i](0)
