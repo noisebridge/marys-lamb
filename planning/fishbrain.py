@@ -3,7 +3,7 @@ import numpy as np
 from controller.controller_enum import DiscreteControls
 
 # Clear threshold
-CLEAR = 0.38
+CLEAR = 0.45
 # Outputs the action
 def create_action(mask):
     third_length = mask.shape[1] // 3

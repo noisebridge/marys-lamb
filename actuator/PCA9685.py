@@ -3,8 +3,8 @@ from controller.controller_enum import DiscreteControls
 
 PCA_THROTTLE=0
 PCA_STEERING=1
-FULL_THROTTLE=410
-COAST=400
+FULL_THROTTLE=395
+COAST=380
 
 # TODO : USE PCA_THROTTLE and PCA_STEERING in code.
 class PCA9685:
@@ -58,7 +58,7 @@ class PCA9685:
         # Only supported case: DiscreteControls
         if type(pca_input) == DiscreteControls:
             if pca_input == DiscreteControls.STOP:
-                self.set_pulse(0, PCA_THROTTLE)
+                self.set_pulse(360, PCA_THROTTLE)
                 self.set_pulse(375, PCA_STEERING)
             elif pca_input == DiscreteControls.LEFT:
                 self.intermittent_accel(PCA_THROTTLE)
