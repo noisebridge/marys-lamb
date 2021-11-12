@@ -14,6 +14,9 @@ Install the following (Python) dependencies (will make install file):
 
 ## Running on pi
 
+Use git-lfs to download the TFLite model.
+**TODO: explain how to do this, add sensor / model configs to YAMLs**
+
 ```
 python main.py
 ```
