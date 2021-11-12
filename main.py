@@ -1,6 +1,7 @@
 import time
 from controller.redis_controller import * 
 from actuator.PCA9685 import *
+from actuator.hbridge_gpio import HBridgeGpio
 from sensor.picam import default_camera_sensor, PiCamSensor
 from planning.fishbrain import create_action
 from redis_io import get_redis_instance, store_np_image
@@ -23,11 +24,13 @@ def main():
     unet = UNetWrapper(init_model=False)
     #convert_keras_to_tf_lite('/home/pi/keras-model', '/home/pi/trained_model_pi_converted.tflite')
     #unet.generate_model("/home/pi/tf14-best.h5")
-    unet.load_tf_lite_model("/home/pi/trained_model_10_09.tflite")
+    #unet.load_tf_lite_model("/home/pi/mobile_net.tflite")
+    #unet.load_tf_lite_model("/home/pi/trained_model_10_09.tflite")
+    unet.load_tf_lite_model("/home/pi/trained_model_10_11.tflite")
     # unet.save_keras_model()
     # Only run actuator if present
     try:
-        actuator = PCA9685()
+        actuator = HBridgeGpio()
     except OSError as e:
         actuator = None
     picam = default_camera_sensor()
@@ -54,10 +57,10 @@ def main():
         try:
             controller_direction = controller.run()
             # For always control:
-            #if True:
-            #    direction = controller_direction
-            if controller_direction == DiscreteControls.STOP:
+            if True:
                 direction = controller_direction
+            #if controller_direction == DiscreteControls.STOP:
+            #    direction = controller_direction
             
             if actuator:
                 actuator.run(direction)
@@ -65,6 +68,7 @@ def main():
         except KeyError as e:
             print(e)
         print(direction)
+        print("Total time:", time.time() - start_time)
         i+=1
 
 main()

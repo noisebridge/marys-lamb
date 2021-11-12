@@ -115,10 +115,10 @@ class UNetWrapper:
 
       # The function `get_tensor()` returns a copy of the tensor data.
       # Use `tensor()` in order to get a pointer to the tensor.
-      output_tensor = self._interpreter.tensor(self._output_details[0]['index'])
+      output_tensor = self._interpreter.get_tensor(self._output_details[0]['index'])
 
       # Convert to Numpy array for output
-      return output_tensor()[0]
+      return output_tensor[0]
       
     def save_keras_model(self):
       tf.saved_model.save(self._model, 'keras_model')
@@ -153,7 +153,6 @@ class UNetWrapper:
         else: 
             pred_mask = self._model.predict(image[np.newaxis, :, :, :])
             output = np.array(keras.preprocessing.image.array_to_img(pred_mask))
-        print(output.shape)
         return output
 
 

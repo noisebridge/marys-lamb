@@ -8,3 +8,4 @@ class DiscreteControls(Enum):
     FWD=1
     LEFT=2
     RIGHT=3
+    REV=4
