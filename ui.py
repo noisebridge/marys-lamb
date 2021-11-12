@@ -30,6 +30,9 @@ while True:
                 print('FWD')
                 r.set(control_cmd_key, 'FWD')
             if event.key == pygame.K_DOWN:
+                print('FWD')
+                r.set(control_cmd_key, 'REV')
+            if event.key == pygame.K_SPACE:
                 print('STOP')
                 r.set(control_cmd_key, 'STOP')
 
