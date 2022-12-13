@@ -3,6 +3,8 @@ import numpy as np
 from abc import ABC, abstractmethod
 import typing
 from typing import Sequence
+from functools import partial
+
 
 
 # Adds Gaussian Noise of mean mu and variance sigma to an input value.  
@@ -103,37 +105,15 @@ class ParticleFilter:
     # @param likelihood_func List of functions that return the likelihood of being in a location given location and input data
     # TODO: Particle range doesn't work with one specification
     # NOTE: Only (x,y) particle type is supported at the moment. 
-    def __init__(self, n_particles, particle_range, measurement_model, process_model, viable_particle_func = None):
+    def __init__(self, n_particles, measurement_model, process_model, particle_factory):
         self.n_particles = n_particles
         self.measurement_model = measurement_model
         self.process_model = process_model
-        if viable_particle_func is None:
-            self.viable_particle_func = lambda x : True
-        else:
-            self.viable_particle_func = viable_particle_func
-        if np.isscalar(particle_range[0]):
-            self.max_locations = (particle_range[0], particle_range[1])
-            self.min_locations = (0, 0)
-        else:
-            self.max_locations = particle_range[1]
-            self.min_locations = particle_range[0]
         self.particles = list()
         for i in range(self.n_particles):
-            self.particles.append(self._init_particle(self.max_locations, self.min_locations))
+            self.particles.append(particle_factory())
         # self.particles = np.array(self.particles)
         self.top_10 = self.particles[:10]
-
-    def _init_particle(self, max_locations, min_locations=(0,0)):
-        viable_particle = False
-        loc_y = 0
-        loc_x = 0
-        while not viable_particle:
-            loc_x = int(np.floor(np.random.rand() * (max_locations[0] - min_locations[0]) + min_locations[0]))
-            loc_y = int(np.floor(np.random.rand() * (max_locations[1] - min_locations[1]) + min_locations[1]))
-            # Add heading
-            heading = 0.
-            viable_particle = self.viable_particle_func((loc_x, loc_y, heading))
-        return XYParticle((loc_x, loc_y))
 
     def update(self, data, u=None):
         # --------------
@@ -150,22 +130,38 @@ class ParticleFilter:
         # --------------
         # Resample
         # --------------
-        # self.top_10 = self.particles[np.argsort(likelihoods)[-10:][::-1].tolist()]
+        self.top_10 = [self.particles[i] for i in np.argsort(likelihoods)[-10:][::-1].tolist()]
         indices = np.random.choice(self.n_particles, size=self.n_particles, p=likelihoods)
         self.particles = [self.particles[i] for i in indices]
 
+def xy_map_particle_factory(max_locations, min_locations, viable_location_map):
+    viable_particle = False
+    loc_y = 0
+    loc_x = 0
+    while not viable_particle:
+        loc_x = int(np.floor(np.random.rand() * (max_locations[0] - min_locations[0]) + min_locations[0]))
+        loc_y = int(np.floor(np.random.rand() * (max_locations[1] - min_locations[1]) + min_locations[1]))
+        viable_particle = viable_location_map((loc_x, loc_y))
+    return XYParticle((loc_x, loc_y))
 
 if __name__ == "__main__":
-    def likelihood(y_hat, y_observed):
-        eps=1e-3
-        distance = sum(((y_hat_i - y_observed_i)**2 for y_hat_i, y_observed_i in zip(y_hat, y_observed)))
-        return max(distance, eps)**-1
+    particle_range=(100., 100.)
+    viable_particle_func = lambda x : True
+
+    if np.isscalar(particle_range[0]):
+        max_locations = (particle_range[0], particle_range[1])
+        min_locations = (0, 0)
+    else:
+        max_locations = particle_range[1]
+        min_locations = particle_range[0]
+
+    particle_factory = partial(xy_map_particle_factory, max_locations, min_locations, viable_particle_func)
 
     pfilter = ParticleFilter(
             n_particles=20,
-            particle_range=(100, 100),
             measurement_model=DirectLocationSensor(),
-            process_model=LinearMovementModel(mu=0., sigma=2.)
+            process_model=LinearMovementModel(mu=0., sigma=2.),
+            particle_factory=particle_factory
     )
 
     # TODO: Realize the particle filter should actually receive a new likelihood function based on estimates
