@@ -1,5 +1,7 @@
 # marys-lamb
-Building a cute little bot that wins Noisebridgers hearts. And money.
+
+Mobile robot (Raspberry Pi v4) which can navigate freespace and has basic teleoperation capabilites
+
 
 # How to run code
 
