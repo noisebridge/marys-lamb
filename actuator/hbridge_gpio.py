@@ -24,10 +24,10 @@ class HBridgeGpio:
         for pin in self._pwm_pins:
             GPIO.setup(pin, GPIO.OUT)
             # Setting PWM to 100, higher values made whiny noises and recommended values are [inconclusive](https://electronics.stackexchange.com/questions/309056/l298n-pwm-frequency)
-            pi_pwm = GPIO.PWM(pin,200)
+            pi_pwm = GPIO.PWM(pin,100)
 
             # PWM ranges from 0 to 100
-            pi_pwm.start(100.)
+            pi_pwm.start(50.)
 
             self._pwms.append(pi_pwm)
 

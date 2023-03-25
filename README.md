@@ -19,6 +19,8 @@ Install the following (Python) dependencies (will make install file):
 Use git-lfs to download the TFLite model.
 **TODO: explain how to do this, add sensor / model configs to YAMLs**
 
+In order to get Redis running, follow the instructions on [this website](https://stackoverflow.com/questions/19091087/open-redis-port-for-remote-connections)
+
 ```
 python main.py
 ```
