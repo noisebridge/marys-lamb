@@ -5,8 +5,10 @@ from controller.controller_enum import DiscreteControls
 
 # 4 motor H bridge
 # Pin order LC, RC, LH, RH (actually not sure which is C or which is H)
-FWD = (GPIO.LOW, GPIO.LOW, GPIO.HIGH, GPIO.HIGH)
-REV = (GPIO.HIGH, GPIO.HIGH, GPIO.LOW, GPIO.LOW)
+# Order on HBridge: (IN1, IN2, IN3, IN4)
+# TODO: Fix this to make more sense from HBridge perspective
+FWD = (GPIO.HIGH, GPIO.LOW, GPIO.HIGH, GPIO.LOW)
+REV = (GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.HIGH)
 LEFT = (GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH)
 RIGHT = (GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
 STOP = (GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.LOW)
@@ -14,8 +16,11 @@ STOP = (GPIO.LOW, GPIO.LOW, GPIO.LOW, GPIO.LOW)
 class HBridgeGpio:
     def __init__(self):
         # use P1 header pin numbering convention
+        # For pinout code, see 
+        # https://learn.sparkfun.com/tutorials/introduction-to-the-raspberry-pi-gpio-and-physical-computing/gpio-pins-overview
         GPIO.setmode(GPIO.BOARD)
         # TODO: Make this a config
+        # self._pins = (3, 8, 5, 10)
         self._pins = (3, 8, 5, 10)
         self._pwm_pins = [32, 12]
         self._pwms = []
@@ -24,12 +29,14 @@ class HBridgeGpio:
         for pin in self._pwm_pins:
             GPIO.setup(pin, GPIO.OUT)
             # Setting PWM to 100, higher values made whiny noises and recommended values are [inconclusive](https://electronics.stackexchange.com/questions/309056/l298n-pwm-frequency)
-            pi_pwm = GPIO.PWM(pin,100)
+            # But this is different
+            # pi_pwm = GPIO.PWM(pin,1000)
 
             # PWM ranges from 0 to 100
-            pi_pwm.start(50.)
+            # pi_pwm.start(100.)
+            #self._pwms.append(pi_pwm)
+            GPIO.output(pin, GPIO.HIGH)
 
-            self._pwms.append(pi_pwm)
 
     def set_gpio(self, gpio_settings):
         for gpio_out, pin in zip(gpio_settings, self._pins):
